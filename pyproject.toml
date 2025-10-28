@@ -1,0 +1,93 @@
+[build-system]
+requires = ['setuptools >=61.0']
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyabricate"
+dynamic = ["version"]
+description = "A Python port of ABRicate, a tool for mass screening of contigs for antibiotic resistance and virulence genes."
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "COPYING" }
+authors = [
+  { name = "Martin Larralde", email = "martin.larralde@embl.de" },
+]
+keywords = ["bioinformatics", "antimicrobial", "antibiotic", "resistance"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = ["pyncbitk >=0.1.0-a3"]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/althonos/pyabricate/issues"
+"Changelog" = "https://github.com/althonos/pyabricate/blob/master/CHANGELOG.md"
+"Coverage" = "https://codecov.io/gh/althonos/pyabricate/"
+"Builds" = "https://github.com/althonos/pyabricate/actions"
+"PyPI" = "https://pypi.org/project/pyabricate"
+
+[project.scripts]
+pyabricate = "pyabricate.cli:main"
+
+[project.entry-points.console_scripts]
+pyabricate = "pyabricate.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"pyabricate.db" = ["*.json.gz"]
+
+[tool.setuptools.packages.find]
+namespaces = false
+include = ["pyabricate", "pyabricate.db"]
+exclude = ["docs*", "tests*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyabricate.__version__"}
+
+[tool.coverage.report]
+include = ["pyabricate/*"]
+omit = ["tests/*"]
+show_missing = true
+exclude_lines = [
+   "pragma: no cover",
+   "raise NotImplementedError",
+   "return NotImplemented",
+   "if __name__ == .__main__.:",
+   "except ImportError:",
+   "if typing.TYPE_CHECKING:",
+   "@abc.abstractmethod",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["pyabricate", "pyabricate.db"]
+
+[tool.pydocstyle]
+inherit = false
+ignore = ["D100", "D101", "D102", "D105", "D107", "D200", "D203", "D213", "D406", "D407"]
+match-dir = "(?!tests)(?!resources)(?!docs)(?!build)[^\\.].*"
+match = "(?!test)(?!setup)[^\\._].*\\.py"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+["tool.mypy-pyabricate.*"]
+disallow_any_decorated = false
+disallow_any_generics = false
+disallow_any_unimported = false
+disallow_subclassing_any = true
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+ignore_missing_imports = false
+warn_unused_ignores = false
+warn_return_any = false

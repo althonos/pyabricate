@@ -1,0 +1,3 @@
+[submodule "vendor/abricate"]
+	path = vendor/abricate
+	url = https://github.com/tseemann/abricate

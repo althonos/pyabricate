@@ -1,14 +1,20 @@
 import json
 import dataclasses
+import gzip
 import typing
-from typing import FrozenSet, Iterable
+from typing import FrozenSet, Iterable, Sequence, Union
 
 from pyncbitk.objects.general import ObjectId
-from pyncbitk.objects.seq import BioSeq, BioSeqSet
+from pyncbitk.objects.seq import BioSeq
+from pyncbitk.objects.seqset import BioSeqSet
 from pyncbitk.objects.seqinst import ContinuousInst
 from pyncbitk.objects.seqdata import IupacNaData
 from pyncbitk.objects.seqid import LocalId
 
+try:
+    from importlib.resources import files as resources_files
+except ImportError:
+    from importlib_resources import files as resources_files
 
 class _Encoder(json.JSONEncoder):
 
@@ -58,6 +64,15 @@ class Database(Sequence[Gene]):
         return self._genes[index]
 
     # --- Serialization --------------------------------------------------------
+
+    @classmethod
+    def from_name(cls, name: str):
+        try:
+            with resources_files(__name__).joinpath(f"{name}.json.gz").open("rb") as f:
+                with gzip.open(f, "rt") as reader:
+                    return cls.load(reader)
+        except FileNotFoundError as err:
+            raise ValueError(f"invalid database name: {name!r}") from err
 
     @classmethod
     def load(cls, file: typing.TextIO) -> "Database":

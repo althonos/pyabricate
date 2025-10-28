@@ -1,0 +1,5 @@
+include *.md
+include COPYING
+
+recursive-include pyabricate      *.py *.pyi py.typed
+recursive-include vendor/abricate *

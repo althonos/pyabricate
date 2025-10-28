@@ -1,5 +1,6 @@
 import dataclasses
 import typing
+import json
 from typing import Iterable, FrozenSet, Union, Sequence
 
 import pyncbitk
@@ -18,6 +19,17 @@ from pyncbitk.objmgr import ObjectManager
 __version__ = "0.1.0"
 __author__ = "Martin Larralde <martin.larralde@embl.de>"
 __license__ = "GPL-3.0-or-later"
+
+
+class _Encoder(json.JSONEncoder):
+
+    def default(self, obj: typing.Any):
+        if dataclasses.is_dataclass(obj):
+            return dataclasses.asdict(obj)
+        elif isinstance(obj, frozenset):
+            return list(obj)
+        return super().default(obj)
+
 
 @dataclasses.dataclass(frozen=True)
 class Gene(object):
@@ -56,6 +68,20 @@ class Database(Sequence[Gene]):
             return Database(self.name, self._genes[index])
         return self._genes[index]
 
+    # --- Serialization --------------------------------------------------------
+
+    @classmethod
+    def load(cls, file: typing.TextIO) -> "Database":
+        data = json.load(file)
+        genes = []
+        for d in data["genes"]:
+            d["resistance"] = frozenset(d["resistance"])
+            genes.append(Gene(**d))
+        return cls(data["name"], genes)
+
+    def dump(self, file: typing.TextIO):
+        db = { "name": self.name, "genes": self._genes }
+        json.dump(db, file, cls=_Encoder)
 
 
 @dataclasses.dataclass(frozen=True, repr=False)
@@ -95,14 +121,14 @@ class Hit:
             chars.append(ord('=' if start <= i <= stop else '.'))
             if i == width // 2 and gaps:
                 chars.append(ord("/"))
-        
+
         return chars.decode()
-   
+
 
 class ResistanceGeneFinder(object):
 
     def __init__(
-        self, 
+        self,
         database: Database,
         min_identity: float = 80.0,
         min_coverage: float = 80.0,
@@ -111,10 +137,10 @@ class ResistanceGeneFinder(object):
         self.min_identity = min_identity
         self.min_coverage = min_coverage
         self.blastn = BlastN(
-            dust_filtering=False, 
-            percent_identity=min_identity, 
-            culling_limit=1, 
-            evalue=1e-20, 
+            dust_filtering=False,
+            percent_identity=min_identity,
+            culling_limit=1,
+            evalue=1e-20,
             max_target_sequences=10000
         )
 
@@ -130,31 +156,31 @@ class ResistanceGeneFinder(object):
                 SearchQuery(WholeSeqLoc(LocalId(ObjectId(i))), scope)
                 for i in range(len(self.database))
             ])
-            
+
             # create the query sequence
             if isinstance(sequence, str):
                 data = IupacNaData.encode(sequence.upper().encode('ascii'))
                 inst = ContinuousInst(data, length=len(record))
                 query = BioSeq(inst, LocalId(ObjectId("query")))
             elif isinstance(sequence, BioSeq):
-                query = BioSeq(sequence.instance, LocalId(ObjectId("query")))
-                queries = BioSeqSet([query])
-            
-            # run BLASTn
-            for result in self.blastn.run(queries, targets):
-                for alignment in result.alignments:
+                query = sequence
 
-                    i = alignment[1].id.object_id.value 
+            # run BLASTn
+            for result in self.blastn.run(query, targets):
+                for alignment in result.alignments:
+                    # retrieve gene information from each hit
+                    i = alignment[1].id.object_id.value
                     gene = self.database[i]
                     alimap = AlignMap(alignment.segments)
                     hit = Hit(gene, self.database, alignment, alimap)
-                    
+
+                    # deduplicate by coordinates?
                     # key = (alignment[0].id.object_id.value, alimap[0].sequence_start, alimap[0].sequence_stop)
                     # if key in seen:
                     #     continue
                     # seen.add(key)
 
+                    # yield back when above coverage threshold
                     if hit.percent_coverage >= self.min_coverage:
                         yield hit
 
-               

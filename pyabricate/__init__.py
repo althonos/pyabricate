@@ -65,6 +65,10 @@ class Hit:
 
 
 class ResistanceGeneFinder(object):
+    database: Database
+    min_identity: float
+    min_coverage: float
+    blastn: BlastN
 
     def __init__(
         self,
@@ -72,6 +76,10 @@ class ResistanceGeneFinder(object):
         min_identity: float = 80.0,
         min_coverage: float = 80.0,
     ):
+        if not isinstance(database, Database):
+            ty = type(sequence).__name__
+            raise TypeError(f"expected Database, found {ty!r}")
+
         self.database = database
         self.min_identity = min_identity
         self.min_coverage = min_coverage
@@ -84,27 +92,31 @@ class ResistanceGeneFinder(object):
         )
 
     def find_genes(self, sequence: Union[str, BioSeq]):
+        # create the query sequence
+        if isinstance(sequence, str):
+            data = IupacNaData.encode(sequence.upper().encode('ascii'))
+            inst = ContinuousInst(data, length=len(record))
+        elif isinstance(sequence, BioSeq):
+            inst = sequence.instance
+        else:
+            ty = type(sequence).__name__
+            raise TypeError(f"expected str or BioSeq, found {ty!r}")
 
+        # use the object manager to handle the database sequences
         with ObjectManager().scope() as scope:
-            # register all sequences inside the scope
+            # register all references inside the scope
             for seq in self.database._seqs:
                 scope.add_bioseq(seq.seq)
-
             # create the vector of BLAST targets
             targets = SearchQueryVector([
                 SearchQuery(WholeSeqLoc(LocalId(ObjectId(i))), scope)
                 for i in range(len(self.database))
             ])
+            # register the query in the scope
+            scope.add_bioseq(BioSeq(inst, LocalId(ObjectId("query"))))
+            query = SearchQuery(WholeSeqLoc(LocalId(ObjectId("query"))), scope)
 
-            # create the query sequence
-            if isinstance(sequence, str):
-                data = IupacNaData.encode(sequence.upper().encode('ascii'))
-                inst = ContinuousInst(data, length=len(record))
-                query = BioSeq(inst, LocalId(ObjectId("query")))
-            elif isinstance(sequence, BioSeq):
-                query = sequence
-
-            # run BLASTn
+            # run BLASTn and process results
             for result in self.blastn.run(query, targets):
                 for alignment in result.alignments:
                     # retrieve gene information from each hit
@@ -112,13 +124,11 @@ class ResistanceGeneFinder(object):
                     gene = self.database[i]
                     alimap = AlignMap(alignment.segments)
                     hit = Hit(gene, self.database, alignment, alimap)
-
                     # deduplicate by coordinates?
                     # key = (alignment[0].id.object_id.value, alimap[0].sequence_start, alimap[0].sequence_stop)
                     # if key in seen:
                     #     continue
                     # seen.add(key)
-
                     # yield back when above coverage threshold
                     if hit.percent_coverage >= self.min_coverage:
                         yield hit

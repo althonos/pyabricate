@@ -1,25 +1,13 @@
 import argparse
 import pathlib
-import multiprocessing.pool
 import sys
 from typing import List
 
-import Bio.SeqIO
-import pyncbitk
-from pyncbitk.algo import BlastN, SearchQuery, SearchQueryVector
-from pyncbitk.objects.general import ObjectId
-from pyncbitk.objects.seq import BioSeq
-from pyncbitk.objects.seqid import LocalId
-from pyncbitk.objects.seqdata import IupacNaData, SeqNaData
-from pyncbitk.objects.seqinst import ContinuousInst
-from pyncbitk.objects.seqset import BioSeqSet
-from pyncbitk.objects.seqloc import WholeSeqLoc
-from pyncbitk.objtools import FastaReader, AlignMap, DatabaseReader
-from pyncbitk.objmgr import ObjectManager
+import pyncbitk.objtools
 
 from . import Gene, Database, ResistanceGeneFinder
 
-def _sign(strand: int):
+def _sign(strand: int) -> str:
     if strand < 0:
         return "-"
     elif strand > 0:
@@ -27,7 +15,7 @@ def _sign(strand: int):
     else:
         return "?"
 
-def build_parser():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(exit_on_error=False)
     parser.add_argument("input", metavar="INPUT", type=pathlib.Path)
     parser.add_argument("--db", "--database", default="ncbi")
@@ -35,23 +23,20 @@ def build_parser():
     parser.add_argument("--mincov", type=float, default=80.0)
     return parser
 
-def main(argv: List[str] = None):
-    parser = build_parser()
-
+def main(argv: List[str] = None) -> int:
     try:
+        parser = build_parser()
         args = parser.parse_args(argv)
-
-        # prepare the gene finder wiht the database
+        # prepare the gene finder with the database
         database = Database.from_name(args.db)
         abricate = ResistanceGeneFinder(
             database,
             min_identity=args.minid,
             min_coverage=args.mincov,
         )
-
-        # iteratively process the inputs
+        # iteratively process the input contigs
         with open(args.input, "rb") as f:
-            reader = FastaReader(f)
+            reader = pyncbitk.objtools.FastaReader(f)
             for query in reader:
                 for hit in abricate.find_genes(query):
                     print(
@@ -64,8 +49,8 @@ def main(argv: List[str] = None):
                         f"{hit.alignment[1].start+1}-{hit.alignment[1].stop+1}/{hit.gene.length}", 
                         hit.minimap(), 
                         f"{hit.alignment.num_gap_openings}/{hit.alignment.total_gap_count}",
-                        format(hit.percent_coverage, "5.2f"),
-                        format(hit.percent_identity, "5.2f"),
+                        f"{hit.percent_coverage:5.2f}",
+                        f"{hit.percent_identity:5.2f}",
                         hit.database.name,
                         hit.gene.accession,
                         hit.gene.description,

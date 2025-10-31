@@ -106,7 +106,7 @@ class ResistanceGeneFinder(object):
         with ObjectManager().scope() as scope:
             # register all references inside the scope
             for seq in self.database._seqs:
-                scope.add_bioseq(seq.seq)
+                scope.add_bioseq(seq.sequence)
             # create the vector of BLAST targets
             targets = SearchQueryVector([
                 SearchQuery(WholeSeqLoc(LocalId(ObjectId(i))), scope)

@@ -4,7 +4,7 @@ import json
 from typing import Iterable, FrozenSet, Union, Sequence
 
 import pyncbitk
-from pyncbitk.algo import BlastN, SearchQuery, SearchQueryVector
+from pyncbitk.algo.blast import BlastN, SearchQuery, SearchQueryVector
 from pyncbitk.objects.general import ObjectId
 from pyncbitk.objects.seq import BioSeq
 from pyncbitk.objects.seqalign import SeqAlign

@@ -1,0 +1,4 @@
+#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	62416	62796	-	blaI_of_Z	1-381/381	===============	0/0	100.00	95.28	ncbi	NG_047499.1	penicillinase repressor BlaI	BETA-LACTAM
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	62786	64543	-	blaR1	1-1758/1758	===============	0/0	100.00	92.83	ncbi	NG_047539.1	beta-lactam sensor/signal transducer BlaR1	BETA-LACTAM
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	64650	65495	+	blaZ	1-846/846	===============	0/0	100.00	96.81	ncbi	NG_055999.1	penicillin-hydrolyzing class A beta-lactamase BlaZ	BETA-LACTAM

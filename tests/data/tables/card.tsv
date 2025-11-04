@@ -1,0 +1,2 @@
+#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	64650	65495	+	PC1_beta-lactamase_(blaZ)	1-846/846	===============	0/0	100.00	96.81	card	CP000732.1:10528-9682	The blaZ beta-lactamase is found in Bacillus subtilis and Staphylococcus aureus.	penam

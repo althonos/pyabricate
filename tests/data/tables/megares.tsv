@@ -1,0 +1,4 @@
+#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	62416	62796	-	BLAI	1-381/381	===============	0/0	100.00	95.28	megares	MEG_1287	Drugs:betalactams:Penicillin_binding_protein_regulator:BLAI	
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	62786	64543	-	BLAR	1-1758/1758	===============	0/0	100.00	92.83	megares	MEG_1302	Drugs:betalactams:Penicillin_binding_protein_regulator:BLAR	
+vendor/abricate/test/LGJG01000038.fa	LGJG01000038	64608	65495	+	BLAZ	1-888/888	===============	0/0	100.00	99.78	megares	MEG_1411	Drugs:betalactams:Class_A_betalactamases:BLAZ	

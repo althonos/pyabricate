@@ -8,7 +8,7 @@ from pyabricate import ResistanceGeneFinder, Database
 from pyncbitk.objects.seqdesc import TitleDesc
 
 
-class TestResistanceGeneFinder(unittest.TestCase):
+class _TestBase(object):
 
     @classmethod
     def setUpClass(cls):
@@ -40,36 +40,47 @@ class TestResistanceGeneFinder(unittest.TestCase):
             self.assertEqual(hit.alignment[0].stop + 1, int(row[3]))
 
 
-    def _test_run(self, dbname):
-        db = Database.from_name("ncbi")
+class _TestDb(object):
+
+    def test_run_bioseq(self):
+        db = Database.from_name(self.db_name)
         rgf = ResistanceGeneFinder(db)
         hits = list(rgf.find_genes(self.seq))
         # self.assertEqual(len(hits), 3)
-        self._compare_tables(hits, "ncbi.tsv")
+        self._compare_tables(hits, f"{self.db_name}.tsv")
 
-    def test_run_argannot(self):
-        self._test_run("argannot")
+    def test_run_str(self):
+        db = Database.from_name(self.db_name)
+        rgf = ResistanceGeneFinder(db)
+        seq = self.seq.instance.data.decode()
+        hits = list(rgf.find_genes(seq))
+        # self.assertEqual(len(hits), 3)
+        self._compare_tables(hits, f"{self.db_name}.tsv")
 
-    def test_run_card(self):
-        self._test_run("card")
 
-    def test_run_ecoh(self):
-        self._test_run("ecoh")
+class TestArgannot(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "argannot"
 
-    def test_run_ecoli_vf(self):
-        self._test_run("ecoli_vf")
+class TestCard(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "card"
 
-    def test_run_megares(self):
-        self._test_run("megares")
+class TestEcoh(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "ecoh"
 
-    def test_run_ncbi(self):
-        self._test_run("ncbi")
+class TestEcoliVf(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "ecoh"
 
-    def test_run_plasmidfinder(self):
-        self._test_run("plasmidfinder")
+class TestMegares(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "megares"
 
-    def test_run_resfinder(self):
-        self._test_run("resfinder")
+class TestNcbi(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "ncbi"
 
-    def test_run_vfdb(self):
-        self._test_run("vfdb")
+class TestPlasmidFinder(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "plasmidfinder"
+
+class TestResFinder(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "resfinder"
+
+class TestVfdb(_TestBase, _TestDb, unittest.TestCase):
+    db_name = "vfdb"

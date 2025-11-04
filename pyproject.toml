@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
-dependencies = ["pyncbitk >=0.1.0-a3"]
+dependencies = ["pyncbitk >=0.1.0-a5"]
 
 [project.urls]
 "Bug Tracker" = "https://github.com/althonos/pyabricate/issues"

@@ -14,7 +14,7 @@ from pyncbitk.objects.seqinst import SeqInst, ContinuousInst
 from pyncbitk.objects.seqset import BioSeqSet
 from pyncbitk.objects.seqloc import WholeSeqLoc
 from pyncbitk.objtools import FastaReader, AlignMap, DatabaseReader
-from pyncbitk.objmgr import ObjectManager
+from pyncbitk.objmgr import ObjectManager, BioSeqHandle
 
 from .db import Database, Gene
 
@@ -95,8 +95,8 @@ class ResistanceGeneFinder(object):
         # create the query sequence
         if isinstance(sequence, str):
             data = IupacNaData.encode(sequence.upper().encode('ascii'))
-            inst = ContinuousInst(data, length=len(record))
-        elif isinstance(sequence, BioSeq):
+            inst = ContinuousInst(data, length=len(sequence))
+        elif isinstance(sequence, (BioSeq, BioSeqHandle)):
             inst = sequence.instance
         else:
             ty = type(sequence).__name__

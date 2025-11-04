@@ -42,6 +42,14 @@ class build_py(_build_py):
     """A modified `build_py` command to download data files.
     """
 
+    user_options = _build_py.user_options + [
+        ("inplace", "i", "build files inplace"),
+    ]
+
+    def initialize_options(self):
+        _build_py.initialize_options(self)
+        self.inplace = False
+
     def _to_json(self, srcpath, dstpath):
         dbname = srcpath.parent.name
         with open(srcpath, "rt") as f:
@@ -88,6 +96,11 @@ class build_py(_build_py):
                     self._to_json,
                     [srcpath, dstpath]
                 )
+                if self.inplace:
+                    self.copy_file(
+                        str(dstpath), 
+                        str(pathlib.Path("pyabricate", "db", f"{dbname}.json.gz"))
+                    )
 
 
 setuptools.setup(cmdclass={"build_py": build_py})

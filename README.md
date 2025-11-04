@@ -30,7 +30,7 @@ NCBI C++ Toolkit interface wrapped in [`pyncbitk`](https://github.com/althonos/p
 to provide BLAST+ rather than using the BLAST+ binaries. It bundles the ABRIcate
 databases so that no additional data or dependencies are needed.
 
-<!-- ## 🔧 Installing
+## 🔧 Installing
 
 This project is supported on Python 3.7 and later.
 
@@ -39,9 +39,6 @@ which hosts some pure-Python wheels that also bundle the ABRicate databases.
 ```console
 $ pip install pyabricate
 ```
-
-*Note that PyABRicate requires PyNCBItk, which may need to compile the NCBI C++
-Toolkit to be setup on your machine.* -->
 
 ## 💡 Example
 

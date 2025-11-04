@@ -14,6 +14,7 @@ import xml.etree.ElementTree as etree
 
 import setuptools
 from setuptools.command.build_py import build_py as _build_py
+from setuptools.command.editable_wheel import editable_wheel as _editable_wheel
 
 
 def _parse_fasta(file):
@@ -103,4 +104,13 @@ class build_py(_build_py):
                     )
 
 
-setuptools.setup(cmdclass={"build_py": build_py})
+class editable_wheel(_editable_wheel):
+
+    def run(self):
+        build_py = self.get_finalized_command("build_py")
+        build_py.inplace = True
+        build_py.run()
+        _editable_wheel.run(self)
+
+
+setuptools.setup(cmdclass={"build_py": build_py, "editable_wheel": editable_wheel})

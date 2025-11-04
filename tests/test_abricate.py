@@ -46,7 +46,6 @@ class _TestDb(object):
         db = Database.from_name(self.db_name)
         rgf = ResistanceGeneFinder(db)
         hits = list(rgf.find_genes(self.seq))
-        # self.assertEqual(len(hits), 3)
         self._compare_tables(hits, f"{self.db_name}.tsv")
 
     def test_run_str(self):
@@ -54,7 +53,6 @@ class _TestDb(object):
         rgf = ResistanceGeneFinder(db)
         seq = self.seq.instance.data.decode()
         hits = list(rgf.find_genes(seq))
-        # self.assertEqual(len(hits), 3)
         self._compare_tables(hits, f"{self.db_name}.tsv")
 
 
